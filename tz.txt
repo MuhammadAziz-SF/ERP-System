@@ -1,0 +1,778 @@
+# Backend Task
+
+Deadline: 26 December 23:59 GMT+0500
+
+You should submit your GitHub repository along with your LeetCode account
+
+# **Role:** String Junior Node.js Backend Developer
+
+**Stack:** Node.js (TypeScript), MongoDB
+
+**Goal:** Build correct ERP behaviour for inventory-driven business flows: Products → Purchase Receipt → Sales → Dashboard
+
+---
+
+## A. ERP Principles You Must Follow (Non-Negotiable)
+
+### Core rules
+
+1. **Confirmed documents are immutable**
+    
+    Once CONFIRMED, you cannot edit product lines, quantities, tracking info, prices, or warehouse. To “change” a confirmed document, you must cancel and create a new one.
+    
+2. **Nothing important is deleted**
+    
+    Soft-delete only for master data; operational documents are cancelled, not removed.
+    
+3. **Inventory changes only through documents**
+    
+    Stock increases via **Purchase Receipt**; stock decreases via **Sales**; never manually adjust stock inside product CRUD.
+    
+4. **Auditability is mandatory**
+    
+    Every key action must record: who did it, when, and why (for cancellations).
+    
+
+---
+
+## B. Module 1 — Products (CRUD + Tracking)
+
+### 1) What a Product is in ERP
+
+A product is a **stock entity** with rules about how it is tracked. Tracking types determine the required fields in purchase and sales.
+
+### 2) Product Tracking Types
+
+Each product must have exactly one tracking mode (except variants).
+
+| Tracking Type | Means | Real example |
+| --- | --- | --- |
+| SIMPLE | Quantity only | Rice (by kg), Chair |
+| EXPIRABLE | Quantity + expiration | Milk, Medicine |
+| SERIALIZED | Each unit unique serial | Phones, Laptops |
+| LOT_TRACKED | Quantity grouped by batch/lot | Cement batch, Production lot |
+| VARIANT | Parent + children variants | T-shirt size/color |
+
+**Hard rule:** Tracking type cannot be changed once the product is used in any confirmed document.
+
+---
+
+### 3) Product Data Requirements
+
+Minimum fields:
+
+- `name`
+- `sku` (unique)
+- `unit_of_measure`
+- `tracking_type`
+- `is_active` / soft-delete fields
+
+Recommended (if exists in your ERP):
+
+- `barcode`
+- `min_stock_level` (for low stock alerts)
+- `sale_price_default` (optional)
+- `purchase_price_default` (optional)
+- `variant_attributes` for variant parent (size/colour)
+
+---
+
+### 4) Variant Products Rules (ERP correct behaviour)
+
+- Parent product:
+    - **Not sellable**
+    - **Not stockable**
+    - Exists only to group variants
+- Variant product:
+    - Has its own SKU
+    - Has its own stock
+    - Can be purchased/sold
+
+Example:
+
+- Parent: “T-Shirt”
+- Variants: “T-Shirt / Red / M”, “T-Shirt / Blue / L”
+
+---
+
+### 5) API Behaviour & Validations (Products)
+
+**Create**
+
+- Validate unique SKU
+- Validate tracking_type
+- If VARIANT parent: must include variant attribute schema (e.g., size/colour)
+
+**Update**
+
+- Ifthe  product is used in any confirmed receipt/sale:
+    - Block changes to tracking_type
+    - Block changes to SKU (recommended)
+- Allow edits to name, barcode, min_stock_level, prices, and is_active
+
+**Delete**
+
+- Hard delete forbidden
+- Soft delete allowed only if not used; otherwise, mark inactive
+
+---
+
+### Acceptance Criteria (Products)
+
+- Enforces tracking type rules
+- A variant parent cannot appear in sales/purchase items
+- Used products cannot change tracking type
+- Soft delete implemented
+
+---
+
+---
+
+## C. Module 2 — Purchase Receipt
+
+### 1) What a Purchase Receipt is
+
+A Purchase Receipt confirms: **goods arrived**. It increases stock and records cost. It is not a payment.
+
+> If you implement Purchase Receipt correctly, sales and inventory become reliable.
+> 
+
+---
+
+### 2) Purchase Receipt Lifecycle
+
+Statuses:
+
+```
+DRAFT → CONFIRMED → CANCELLED
+```
+
+### DRAFT
+
+- Fully editable
+- No stock impact
+- No cost impact
+
+### CONFIRMED
+
+- Stock increases
+- Cost recorded/updated
+- Document becomes immutable
+
+### CANCELLED
+
+- Stock decrease (revert)
+- Preserve history
+- Cancellation reason required
+
+---
+
+### 3) Purchase Receipt Required Fields
+
+Header:
+
+- `supplier_id`
+- `warehouse_id`
+- `receipt_date`
+- `currency`
+- optional: `invoice_number`, `comment`
+
+Lines (each product row):
+
+- `product_id` (must be variant if variant-type)
+- `quantity`
+- `unit_price` (purchase price)
+- tracking info depending on product type:
+    - Expirable: `expiration_date`
+    - Lot: `lot_code`
+    - Serial: `serial_numbers[]`
+
+---
+
+### 4) Purchase Receipt Validation Rules (by product type)
+
+### SIMPLE
+
+- quantity > 0
+- unit_price >= 0
+- increases stock by quantity
+
+### EXPIRABLE
+
+- expiration_date required
+- stock must be stored “with expiration info” so later sales can select FIFO by expiration
+
+### LOT_TRACKED
+
+- lot_code required
+- Receipt creates/increases stock inside that lot
+
+### SERIALIZED
+
+- serial_numbers required
+- count(serial_numbers) must equal quantity
+- Serials must be unique globally (or at least per product)
+
+### VARIANT
+
+- parent product is forbidden
+- Only variants accepted
+
+---
+
+### 5) Stock Impact on CONFIRM
+
+On CONFIRMED:
+
+- Increase inventory in that warehouse
+- Create stock records in the tracking layer:
+    - serial entries for serialised
+    - lot entries for lot-tracked
+    - expiration grouping for expirable
+
+**Important:** This is the only moment stock changes for purchasing.
+
+---
+
+### 6) Cost Handling
+
+On CONFIRM, you must store enough data so that costing works.
+
+Minimum:
+
+- Save purchase unit_price & currency on line
+- Save the base-currency converted cost if your ERP uses base currency
+
+Cost method handling (system-level, not per receipt):
+
+- AVG or FIFO
+- Your implementation must **not break** whichever costing method exists
+
+---
+
+### 7) Cancellation Rules
+
+Cancelling a confirmed receipt:
+
+- Must revert inventory changes (remove received quantities)
+- Must revert tracking-level stock (serial/lot/expiration buckets)
+- Must preserve record and reason
+
+Optional restriction (future-safe):
+
+- Block cancellation if received stock already sold (or allow with negative adjustments). If not implemented now, at least log the risk.
+
+---
+
+### Acceptance Criteria (Purchase Receipt)
+
+- DRAFT does not affect stock
+- CONFIRMED increases stock correctly for all tracking types
+- CONFIRMED becomes immutable
+- CANCELLED reverts stock and requires a reason
+- Serial count validation works and prevents duplicates
+
+---
+
+---
+
+## D. Module 3 — Sales
+
+### 1) What a Sale is
+
+A sale is a document that:
+
+- Decreases stock
+- Records what was sold
+- Must be auditable and not editable after confirmation
+
+---
+
+### 2) Sale Lifecycle
+
+Statuses:
+
+```
+DRAFT → CONFIRMED → CANCELLED
+```
+
+### DRAFT
+
+- Editable
+- No stock impact (recommended)
+- Can validate availability optionally (soft check)
+
+### CONFIRMED
+
+- Stock decreases
+- Tracking rules are enforced strictly
+- Document immutable
+
+### CANCELLED
+
+- Stock restored
+- Preserves audit trail
+
+---
+
+### 3) Sale Header Fields
+
+- `customer_id` (optional, depending on POS)
+- `warehouse_id`
+- `sale_date`
+- `currency`
+- `payment_type` (optional if payment handled elsewhere)
+- comment
+
+Sale lines:
+
+- `product_id`
+- `quantity`
+- `unit_price` (selling price)
+- tracking info required by product type:
+    - serial_numbers[]
+    - lot_code
+    - expiration selection or auto-FIFO
+
+---
+
+### 4) Sales Validation Rules (by product type)
+
+### SIMPLE
+
+- quantity > 0
+- must have enough stock available
+
+### SERIALIZED
+
+- serial_numbers requiredThe
+- quantity must equal the number of serials
+- Each serial must exist in stock and be unsold
+
+### LOT_TRACKED
+
+- lot_code required (or system can auto-select FIFO lot if rules exist)
+- ensure lot has enough available quantity
+
+### EXPIRABLE
+
+- enforce expiration rule:
+    - default: FIFO by earliest expiration
+    - or allow manual selection if the UI provides
+- must not sell expired stock (policy decision; default block)
+
+### VARIANT
+
+- parent forbidden
+- Only variants sold
+
+---
+
+### 5) Stock Impact on CONFIRM
+
+On CONFIRM:
+
+- Decrease inventory from the selected warehouse
+- Decrease tracking layer stock:
+    - Mark serials as sold
+    - decrease lot qty
+    - decrease expiration buckets
+
+**Hard rule:** Stock cannot go negative.
+
+---
+
+### 6) Cancellation Rules
+
+Cancelling confirmed sale:
+
+- Restore stock and tracking data
+- Keep sale record
+- Require cancellation reason
+
+---
+
+### Acceptance Criteria (Sales)
+
+- Cannot confirm sale without stock availability
+- Tracking rules enforced for serial/lot/expiration
+- Confirmed sales immutable
+- Cancel restores stock correctly
+
+---
+
+---
+
+## E. Module 4 — Dashboard
+
+### 1) Dashboard Philosophy
+
+Dashboard must reflect **only confirmed documents**.
+
+Draft and cancelled documents must not pollute KPI metrics.
+
+---
+
+### 2) Required Dashboard Endpoints & Definitions
+
+### 1) Sales Summary
+
+- Total Sales Amount (confirmed only)
+- Sales Count
+- Average Sale Value
+
+Filters:
+
+- date range
+- warehouse/branch (if exists)
+- currency/base currency
+
+### 2) Daily Sales Chart
+
+- group sales by day
+- return array: `{date, total_amount, count}`
+
+### 3) Top Products
+
+- top by quantity sold
+- optionally top by revenue
+
+Return:
+
+- product_id, product_name, qty, revenue
+
+### 4) Inventory Summary
+
+- total SKUs
+- total stock quantity (by warehouse)
+- low stock list (qty < min_stock_level)
+
+### 5) Purchase Summary
+
+- total received amount (confirmed receipts only)
+- receipt count
+- top purchased products
+
+---
+
+### Performance Requirement
+
+- Must not loop over documents in Node.js to aggregate
+- Use DB aggregations/pipeline
+- Typical response under 500ms for a normal tenant dataset
+
+---
+
+### Acceptance Criteria
+
+- Ignores DRAFT and CANCELLED docs
+- Filters work correctly
+- Aggregates match underlying confirmed documents
+- Output stable and consistent
+
+---
+
+---
+
+## F. Global Requirements
+
+### 1) Status Transition Enforcement
+
+Only allowed transitions:
+
+- DRAFT → CONFIRMED
+- DRAFT → CANCELLED
+- CONFIRMED → CANCELLED
+    
+    No reverse transitions.
+    
+
+### 2) Audit Fields
+
+Every document must store:
+
+- created_by, created_at
+- confirmed_by, confirmed_at (if confirmed)
+- cancelled_by, cancelled_at, cancellation_reason (if cancelled)
+
+### 3) Error Format
+
+All validation errors must be consistent and readable:
+
+- error_code
+- message
+- field (when applicable)
+
+### 4) Concurrency / Safety
+
+When confirming receipts/sales:
+
+- must ensure no double-confirm
+- prevent negative stock (transaction/locking strategy is developer choice)
+
+---
+
+# Deliverables Expected from Developer
+
+1. API endpoints for:
+    - Products CRUD + variant support
+    - Purchase Receipt lifecycle + confirm/cancel logic
+    - Sales lifecycle + confirm/cancel logic
+    - Dashboard read-only metrics
+2. Validation rules implemented
+3. Status transitions enforced
+4. Audit data is included everywhere
+5. Unit/integration tests for critical rules (at least happy path + core failures)
+
+---
+
+## Milestones for better project structuring
+
+## 🔹 Milestone 0 — ERP Ground Rules & Project Skeleton
+
+**Purpose:** Align mindset before coding business logic
+
+### Scope
+
+- Project structure ready
+- Common enums/constants
+- Base document lifecycle concept
+
+### Tasks
+
+- Define global enums:
+    - DocumentStatus: `DRAFT | CONFIRMED | CANCELLED`
+    - ProductTrackingType
+- Define shared audit fields convention
+- Define common error format
+- Define base document behaviour (no implementation yet)
+
+### Acceptance Criteria
+
+- All modules reuse the same status values
+- No hard deletes planned for documents
+- Developers understand: *status change = business action*
+
+⛔ **No business logic yet**
+
+---
+
+## 🔹 Milestone 1 — Product Module
+
+**Purpose:** Everything else depends on correct product rules
+
+### Scope
+
+- Product CRUD
+- Tracking logic
+- Variant products
+
+### Tasks
+
+1. Product CRUD APIs
+2. Enforce tracking type rules
+3. Implement variant parent + child behaviour
+4. Block illegal updates/deletes
+
+### Key ERP Concepts Learned
+
+- Tracking types
+- Variant vs stockable products
+- Master data immutability
+
+### Acceptance Criteria
+
+- Tracking type required and enforced
+- A variant parent cannot be sold or stocked
+- Tracking type cannot be changed after usage
+- Soft delete only
+
+⛔ **No stock movement here**
+
+---
+
+## 🔹 Milestone 2 — Inventory Core
+
+**Purpose:** Centralise stock logic before documents use it
+
+### Scope
+
+- Internal inventory service
+- Stock availability checks
+- Tracking-level stock records
+
+### Tasks
+
+- Create internal inventory methods:
+    - increaseStock()
+    - decreaseStock()
+    - checkAvailability()
+- Support:
+    - simple quantity
+    - serial
+    - lot
+    - expiration
+
+### Key ERP Concepts Learned
+
+- Stock ≠ Product
+- Tracking-level inventory
+- Single source of truth
+
+### Acceptance Criteria
+
+- Stock logic reusable for purchase & sales
+- No negative stock allowed
+- Serial uniqueness enforced
+
+⛔ **No documents yet**
+
+---
+
+## 🔹 Milestone 3 — Purchase Receipt
+
+**Purpose:** Teach how inventory enters the system
+
+### Scope
+
+- Purchase Receipt CRUD
+- Confirm / Cancel logic
+- Stock & cost impact
+
+### Tasks
+
+1. Purchase Receipt DRAFT creation
+2. Validate receipt lines by product tracking type
+3. CONFIRM logic:
+    - Increase stock
+    - Record cost
+4. CANCEL logic:
+    - Revert stock
+    - Require reason
+
+### Key ERP Concepts Learned
+
+- Document lifecycle
+- Stock inflow
+- Cost recorded on receipt, not payment
+
+### Acceptance Criteria
+
+- DRAFT has no stock impact
+- CONFIRMED increases stock correctly
+- CONFIRMED is immutable
+- CANCELLED reverts stock
+- Serial /lot/expiration enforced
+
+---
+
+## 🔹 Milestone 4 — Sales
+
+**Purpose:** Teach how inventory leaves the system
+
+### Scope
+
+- Sales CRUD
+- Stock reservation & decrease
+- Tracking enforcement
+
+### Tasks
+
+1. Sales DRAFT creation
+2. Stock availability validation
+3. CONFIRM logic:
+    - Decrease stock
+    - Lock tracking items
+4. CANCEL logic:
+    - Restore stock
+    - Require reason
+
+### Key ERP Concepts Learned
+
+- Stock outflow
+- Strict immutability
+- No negative stock rule
+
+### Acceptance Criteria
+
+- Cannot confirm the sale without stock
+- Serial/lot/expiration strictly enforced
+- CONFIRMED sales immutable
+- Cancellation restores stock
+
+---
+
+## 🔹 Milestone 5 — Dashboard
+
+**Purpose:** Teach the difference between operational data and reporting
+
+### Scope
+
+- Aggregation APIs only
+- No writes
+
+### Tasks
+
+- Sales summary
+- Daily sales
+- Top products
+- Inventory summary
+- Purchase summary
+
+### Key ERP Concepts Learned
+
+- Reports read CONFIRMED data only
+- Aggregation ≠ business logic
+
+### Acceptance Criteria
+
+- Draft/cancelled docs ignored
+- Filters respected
+- No business rules inside the dashboard
+
+---
+
+## 🔹 Milestone 6 — Safety, Validation & Hardening
+
+**Purpose:** Catch ERP-breaking mistakes
+
+### Scope
+
+- Edge cases
+- Validation tightening
+- Consistency
+
+### Tasks
+
+- Prevent double confirmation
+- Prevent race condition stock issues
+- Ensure cancellation rules are consistent
+- Add rejection for illegal state transitions
+
+### Acceptance Criteria
+
+- No double stock mutation possible
+- Status transitions are strictly enforced
+- Error messages consistent
+
+---
+
+## 🔹 Milestone 7 — Minimal Test Coverage
+
+**Purpose:** Ensure ERP logic is not fragile
+
+### Required Tests
+
+- Purchase receipt confirms → stock increases
+- Sales confirm → stock decreases
+- Sale without stock → blocked
+- Cancel receipt → stock restored
+- Cancel sale → stock restored
+- Serial mismatch → blocked
+
+### Acceptance Criteria
+
+- Core ERP rules covered
+- Tests fail on rule violation
+
+---
