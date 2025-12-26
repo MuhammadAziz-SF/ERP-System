@@ -16,9 +16,6 @@ export class PartnerRepository extends BaseRepository<PartnerDocument> {
   }
 
   async findByType(type: PartnerType): Promise<PartnerDocument[]> {
-    // Can match directly or if type is BOTH, it implies it includes BOTH?
-    // Usually if I search for CUSTOMER, I want CUSTOMER or BOTH.
-    // Implementing exact match for now as per simplicity.
     return this.findAll({ type } as any);
   }
 

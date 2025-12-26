@@ -65,7 +65,7 @@ export class PurchaseReceiptsService {
       throw new BadRequestException('Only Draft receipts can be updated');
     }
 
-    let updateData: any = { ...updateDto };
+    const updateData: any = { ...updateDto };
 
     if (updateDto.items) {
       let totalAmount = 0;
@@ -101,7 +101,6 @@ export class PurchaseReceiptsService {
     if (receipt.status !== DocumentStatus.DRAFT) {
       throw new BadRequestException('Only Draft receipts can be confirmed');
     }
-
 
     for (const item of receipt.items) {
       await this.inventoryService.increaseStock(
@@ -142,7 +141,7 @@ export class PurchaseReceiptsService {
     return this.purchaseReceiptRepository.cancelReceipt(id, userId, reason);
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string, _userId: string) {
     const receipt = await this.findOne(id);
     if (receipt.status !== DocumentStatus.DRAFT) {
       throw new BadRequestException('Only Draft receipts can be deleted');

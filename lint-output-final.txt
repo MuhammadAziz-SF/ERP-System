@@ -1,0 +1,22 @@
+
+> ERP@0.0.1 lint
+> eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\inventory\inventory.service.spec.ts
+  4:10  warning  'BadRequestException' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\purchase-receipts.controller.ts
+  17:3  warning  'ApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\purchase-receipts.service.ts
+  144:28  warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\sales.controller.ts
+  17:3  warning  'ApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\sales.service.ts
+  133:28  warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+Γ£û 5 problems (0 errors, 5 warnings)
+

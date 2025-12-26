@@ -11,13 +11,7 @@ import {
 import { PurchaseReceiptsService } from './purchase-receipts.service';
 import { CreatePurchaseReceiptDto } from './dto/create-purchase-receipt.dto';
 import { UpdatePurchaseReceiptDto } from './dto/update-purchase-receipt.dto';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiHeader,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiHeader, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Purchase Receipts')
 @Controller('purchase-receipts')

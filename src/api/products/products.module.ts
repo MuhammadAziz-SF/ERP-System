@@ -2,12 +2,21 @@ import { Module } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProductSchema } from 'src/core/entities/product.entity';
+import { Product, ProductSchema } from 'src/core/entities/product.entity';
 import { ProductRepository } from 'src/core/repository/product.repository';
+import { Sale, SaleSchema } from 'src/core/entities/sales.entity';
+import {
+  PurchaseReceipt,
+  PurchaseReceiptSchema,
+} from 'src/core/entities/purchase-receipt.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Product', schema: ProductSchema }]),
+    MongooseModule.forFeature([
+      { name: Product.name, schema: ProductSchema },
+      { name: Sale.name, schema: SaleSchema },
+      { name: PurchaseReceipt.name, schema: PurchaseReceiptSchema },
+    ]),
   ],
   controllers: [ProductsController],
   providers: [ProductsService, ProductRepository],

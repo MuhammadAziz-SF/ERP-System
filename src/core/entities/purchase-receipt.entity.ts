@@ -30,7 +30,12 @@ class PurchaseItem {
 
 @Schema({ timestamps: true, collection: 'purchase_receipts' })
 export class PurchaseReceipt {
-  @Prop({ required: true, default: DocumentStatus.DRAFT, enum: DocumentStatus })
+  @Prop({
+    required: true,
+    default: DocumentStatus.DRAFT,
+    enum: DocumentStatus,
+    type: String,
+  })
   status: DocumentStatus;
 
   @Prop({ required: true })

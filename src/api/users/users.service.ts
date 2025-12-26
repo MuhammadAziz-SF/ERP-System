@@ -8,7 +8,6 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   create(createUserDto: CreateUserDto) {
-    // In real app, hash password here
     return this.userRepository.create(createUserDto);
   }
 

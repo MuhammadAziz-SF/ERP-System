@@ -64,7 +64,7 @@ export class SalesService {
       throw new BadRequestException('Only Draft sales can be updated');
     }
 
-    let updateData: any = { ...updateDto };
+    const updateData: any = { ...updateDto };
 
     if (updateDto.items) {
       let totalAmount = 0;
@@ -130,7 +130,7 @@ export class SalesService {
     return this.salesRepository.cancelSale(id, userId, reason);
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string, _userId: string) {
     const sale = await this.findOne(id);
     if (sale.status !== DocumentStatus.DRAFT) {
       throw new BadRequestException('Only Draft sales can be deleted');

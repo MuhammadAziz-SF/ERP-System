@@ -8,6 +8,7 @@ import { PurchaseReceiptsModule } from './purchase-receipts/purchase-receipts.mo
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { SalesModule } from './sales/sales.module';
 import { PartnersModule } from './partners/partners.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PartnersModule } from './partners/partners.module';
     WarehouseModule,
     SalesModule,
     PartnersModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],

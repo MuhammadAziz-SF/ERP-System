@@ -42,7 +42,6 @@ export class InventoryRepository extends BaseRepository<InventoryDocument> {
   }
 
   async getTotalStockInitial(productId: string): Promise<number> {
-    // Aggregation pipeline to sum quantities
     const result = await this.inventoryModel.aggregate([
       { $match: { product_id: new Types.ObjectId(productId) } },
       { $group: { _id: null, total: { $sum: '$quantity' } } },

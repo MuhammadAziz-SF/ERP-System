@@ -12,10 +12,8 @@ export class User {
   full_name: string;
 
   @Prop({ required: true })
-  role: string; // 'admin', 'warehouse_manager', 'cashier'
+  role: string;
 
-  // Parol va auth logikasi bu topshiriqning asosiy qismi emas,
-  // lekin login qilish uchun kerak bo'lsa qo'shasiz.
   @Prop({ select: false })
   password?: string;
 }

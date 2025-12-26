@@ -17,50 +17,51 @@ class SaleItem {
 
   @Prop({ min: 0 })
   total_line_price: number;
-  // --- Tracking Info (Qaysi biri sotilayotgani) ---
+
   @Prop({ type: [String] })
-  serial_numbers?: string[]; // Aniq qaysi seriallar ketdi
+  serial_numbers?: string[];
 
   @Prop()
-  lot_code?: string; // Qaysi partiyadan (FIFO uchun kerak)
+  lot_code?: string;
 }
 
 @Schema({ timestamps: true, collection: 'sales' })
 export class Sale {
-  // --- Header ---
-  @Prop({ required: true, default: DocumentStatus.DRAFT, enum: DocumentStatus })
+  @Prop({
+    required: true,
+    default: DocumentStatus.DRAFT,
+    enum: DocumentStatus,
+    type: String,
+  })
   status: DocumentStatus;
 
   @Prop({ required: true })
   sale_date: Date;
 
   @Prop()
-  customer_id?: string; // Mijoz (ixtiyoriy, masalan POS uchun)
+  customer_id?: string;
 
   @Prop({ required: true })
-  warehouse_id: string; // Qaysi ombordan chiqib ketyapti
+  warehouse_id: string;
 
   @Prop({ required: true })
   currency: string;
 
   @Prop()
-  payment_type?: string; // Cash, Card, Transfer
+  payment_type?: string;
 
   @Prop()
   comment?: string;
 
-  // --- Items ---
   @Prop({ type: [SaleItem], default: [] })
   items: SaleItem[];
 
-  // --- Totals ---
   @Prop({ default: 0 })
   total_amount: number;
 
   @Prop({ default: 0 })
   total_quantity: number;
 
-  // --- Audit ---
   @Prop()
   created_by: string;
 

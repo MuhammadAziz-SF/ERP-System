@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { BaseRepository } from './base.repository';
 import { Sale, SaleDocument } from '../entities/sales.entity';
 
-import { Types } from 'mongoose';
 import { DocumentStatus } from '../../common/enums/erp.enum';
 
 @Injectable()
@@ -45,10 +44,8 @@ export class SalesRepository extends BaseRepository<SaleDocument> {
   async updateWithAudit(
     id: string,
     data: Partial<Sale>,
-    userId: string, // Although update usually doesn't change created_by, maybe we track last modified?
-    // Sale entity doesn't have updated_by, but has specific status fields.
+    _userId: string,
   ): Promise<SaleDocument | null> {
-    // If confirming or cancelling, we have specific fields
     return this.update(id, data as any);
   }
 

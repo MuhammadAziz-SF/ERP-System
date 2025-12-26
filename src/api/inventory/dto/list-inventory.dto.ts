@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { IsMongoId, IsOptional } from 'class-validator';
 
 export class ListInventoryDto {
   @ApiProperty({ required: false, description: 'Filter by Warehouse ID' })

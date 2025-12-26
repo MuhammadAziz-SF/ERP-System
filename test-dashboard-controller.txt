@@ -1,0 +1,54 @@
+
+> ERP@0.0.1 test
+> jest dashboard.controller.spec.ts
+
+FAIL src/api/dashboard/dashboard.controller.spec.ts
+  DashboardController
+    ├ù should be defined (8 ms)
+
+  ΓùÅ DashboardController ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the DashboardService (?, PurchaseReceiptRepository, InventoryRepository, ProductRepository, SaleModel, PurchaseReceiptModel). Please make sure that the argument SalesRepository at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If SalesRepository is a provider, is it part of the current RootTestModule?
+    - If SalesRepository is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing SalesRepository */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+       7 |
+       8 |   beforeEach(async () => {
+    >  9 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      10 |       controllers: [DashboardController],
+      11 |       providers: [DashboardService],
+      12 |     }).compile();
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/injector.js:286:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/.pnpm/@nestjs+testing@11.1.10_@ne_9d8467b217746a7682366920a465ef93/node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/.pnpm/@nestjs+core@11.1.10_@nestj_b5f02ff7785faa9780f5d6ffeeed115b/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/.pnpm/@nestjs+testing@11.1.10_@ne_9d8467b217746a7682366920a465ef93/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/.pnpm/@nestjs+testing@11.1.10_@ne_9d8467b217746a7682366920a465ef93/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/.pnpm/@nestjs+testing@11.1.10_@ne_9d8467b217746a7682366920a465ef93/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (api/dashboard/dashboard.controller.spec.ts:9:35)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        1.71 s, estimated 3 s
+Ran all test suites matching dashboard.controller.spec.ts.

@@ -1,0 +1,56 @@
+
+> ERP@0.0.1 lint
+> eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\inventory\dto\list-inventory.dto.ts
+  2:33  warning  'IsString' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\inventory\inventory.service.spec.ts
+  4:10  warning  'BadRequestException' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\partners\dto\update-partner.dto.ts
+  1:10  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\products\dto\update-product.dto.ts
+  1:23  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\dto\update-purchase-receipt.dto.ts
+  1:23  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\purchase-receipts.controller.ts
+  17:3  warning  'ApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\purchase-receipts.service.spec.ts
+  16:9  warning  'mockSupplierId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\purchase-receipts\purchase-receipts.service.ts
+  144:28  warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\dto\update-sale.dto.ts
+  1:23  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\sales.controller.ts
+  17:3  warning  'ApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\sales.service.spec.ts
+  17:9  warning  'mockCustomerId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\sales\sales.service.ts
+  133:28  warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\users\dto\update-user.dto.ts
+  1:10  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\api\warehouse\dto\update-warehouse.dto.ts
+  1:10  warning  'ApiProperty' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\core\repository\purchase-receipt.repository.ts
+  48:5  warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\Metthew\Desktop\work\ERP\src\core\repository\sales.repository.ts
+   7:10  warning  'Types' is defined but never used                                         @typescript-eslint/no-unused-vars
+  48:5   warning  'userId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+Γ£û 17 problems (0 errors, 17 warnings)
+

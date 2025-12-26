@@ -1,0 +1,27 @@
+FAIL src/api/purchase-receipts/purchase-receipts.service.spec.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot determine a type for the "PurchaseReceipt.status" field (union/intersection/ambiguous type was used). Make sure your property is decorated with a "@Prop({ type: TYPE_HERE })" decorator.
+
+      2 | import { HydratedDocument, Types } from 'mongoose';
+      3 | import { DocumentStatus } from '../../common/enums/erp.enum';
+    > 4 |
+        | ^
+      5 | export type PurchaseReceiptDocument = HydratedDocument<PurchaseReceipt>;
+      6 |
+      7 | @Schema()
+
+      at ../node_modules/.pnpm/@nestjs+mongoose@11.0.4_@ne_1634137d949f33ff041f7ae23712849d/node_modules/@nestjs/mongoose/lib/decorators/prop.decorator.ts:33:15
+      at DecorateProperty (../node_modules/.pnpm/reflect-metadata@0.2.2/node_modules/reflect-metadata/Reflect.js:561:33)
+      at Reflect.decorate (../node_modules/.pnpm/reflect-metadata@0.2.2/node_modules/reflect-metadata/Reflect.js:136:24)
+      at __decorate (core/entities/purchase-receipt.entity.ts:4:92)
+      at Object.<anonymous> (core/entities/purchase-receipt.entity.ts:34:3)
+      at Object.<anonymous> (core/repository/purchase-receipt.repository.ts:5:1)
+      at Object.<anonymous> (api/purchase-receipts/purchase-receipts.service.ts:8:1)
+      at Object.<anonymous> (api/purchase-receipts/purchase-receipts.service.spec.ts:1:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        1.338 s
+Ran all test suites matching src/api/purchase-receipts/purchase-receipts.service.spec.ts.

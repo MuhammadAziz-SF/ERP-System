@@ -35,7 +35,8 @@ export class InventoryService {
 
   async findAll(query: any): Promise<any[]> {
     const filter: any = {};
-    if (query.product_id) filter.product_id = new Types.ObjectId(query.product_id);
+    if (query.product_id)
+      filter.product_id = new Types.ObjectId(query.product_id);
     if (query.warehouse_id)
       filter.warehouse_id = new Types.ObjectId(query.warehouse_id);
 
@@ -101,7 +102,7 @@ export class InventoryService {
     warehouseId: string,
     quantity: number,
   ) {
-    let inventory = await this.inventoryRepository.findOne({
+    const inventory = await this.inventoryRepository.findOne({
       product_id: new Types.ObjectId(productId),
       warehouse_id: new Types.ObjectId(warehouseId),
       serial_number: { $exists: false },
@@ -165,7 +166,7 @@ export class InventoryService {
       );
     }
 
-    let inventory = await this.inventoryRepository.findOne({
+    const inventory = await this.inventoryRepository.findOne({
       product_id: new Types.ObjectId(productId),
       warehouse_id: new Types.ObjectId(warehouseId),
       lot_code: trackingInfo.lot_code,
@@ -196,7 +197,7 @@ export class InventoryService {
       );
     }
 
-    let inventory = await this.inventoryRepository.findOne({
+    const inventory = await this.inventoryRepository.findOne({
       product_id: new Types.ObjectId(productId),
       warehouse_id: new Types.ObjectId(warehouseId),
       expiration_date: trackingInfo.expiration_date,
@@ -388,5 +389,4 @@ export class InventoryService {
       );
     }
   }
-
 }
